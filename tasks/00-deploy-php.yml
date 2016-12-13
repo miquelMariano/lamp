@@ -1,0 +1,20 @@
+---
+
+- name: Install php rpm
+  yum:
+    name={{ item }}
+    state=present
+    disable_gpg_check=yes
+  with_items:
+    - php
+    - php-mysql
+    - php-gd
+    - php-pear 
+
+- name: Test PHP
+  copy:
+    src=phpversion.php
+    dest=/var/www/html
+    owner=apache
+    group=apache
+

@@ -1,0 +1,58 @@
+---
+
+- name: Install HAProxy and Keepalived rpm
+  yum:
+    name={{ item }}
+    state=present
+    disable_gpg_check=yes
+  with_items:
+    - haproxy
+    - keepalived
+    - psmisc
+# psmisc debe estar instalado para que keepalived pueda hacer uso del killall para checkear el proceso haproxy
+
+- name: Set ip forwarding on in /proc and in the sysctl file and reload if necessary 
+  sysctl: 
+    name="net.ipv4.ip_nonlocal_bind" 
+    value=1 
+    sysctl_set=yes 
+    state=present 
+    reload=yes
+
+- name: Set configuration on the master node
+  template:
+    src=keepalived-master.conf
+    dest=/etc/keepalived/keepalived.conf
+  when: keepalived == 'master'
+
+- name: Set configuration on the slave node
+  template:
+    src=keepalived-slave.conf
+    dest=/etc/keepalived/keepalived.conf
+  when: keepalived == 'slave'
+
+- name: Set HAproxy configuration
+  template:
+    src=haproxy.cfg
+    dest=/etc/haproxy/haproxy.cfg
+
+- name: Restart HAProxy and Keepalived service and set it to start automatically on every reboot
+  service:
+    name={{ item }}
+    state=restarted
+    enabled=yes
+  with_items:
+    - haproxy
+    - keepalived
+
+
+#- name: Enable floating/shared IP
+##  lineinfile: 
+##    dest=/etc/sysctl.conf
+##    line="net.ipv4.ip_nonlocal_bind=1"
+##    state=present
+#
+##- name: Enable changes
+##  command: sysctl -p
+#
+##net.ipv4.ip_nonlocal_bind=1

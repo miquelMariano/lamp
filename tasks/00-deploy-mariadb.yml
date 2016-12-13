@@ -1,0 +1,47 @@
+---
+
+- name: Stop MariaDB if service already exist
+  service:
+    name=mariadb
+    state=stopped
+  ignore_errors: yes
+
+- name: Install mariadb rpm
+  yum:
+    name={{ item }}
+    state=present
+    disable_gpg_check=yes
+  with_items:
+    - mariadb-server
+    - mariadb
+    - MySQL-python 
+
+- name: Start MariaDB service and set it to start automatically on every reboot
+  service:
+    name=mariadb
+    state=started
+    enabled=yes
+
+- name: Update mysql root password for all root accounts | first start | ignore if already changed
+  mysql_user:
+     name=root
+     host=localhost
+     password={{ root_mariadb_password }}
+  ignore_errors: yes
+
+- name: Update mysql root password for all root accounts
+  mysql_user: 
+     login_user=root
+     login_password={{ root_mariadb_password }}
+     name=root 
+     host=localhost 
+     password={{ root_mariadb_password }}
+  ignore_errors: yes
+
+- name: Create demo database
+  mysql_db:
+   login_user=root
+   login_password={{ root_mariadb_password }}
+   name=ansible-demo-db 
+   state=present
+
