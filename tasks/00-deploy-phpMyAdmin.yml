@@ -1,5 +1,10 @@
 ---
 
+- name: Ensure epel-release repo are installed
+  yum:
+    name: epel-release
+    state: latest
+
 - name: Install phpMyAdmin rpm
   yum:
     name: phpmyadmin
