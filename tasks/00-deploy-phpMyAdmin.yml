@@ -2,9 +2,9 @@
 
 - name: Install phpMyAdmin rpm
   yum:
-    name=phpmyadmin
-    state=present
-    disable_gpg_check=yes
+    name: phpmyadmin
+    state: present
+    disable_gpg_check: yes
 
 - name: phpMyAdmin config file
   template:
@@ -13,8 +13,8 @@
 
 - name: Restart httpd
   service:
-    name=httpd
-    state=restarted
+    name: httpd
+    state: restarted
 
 
 #- name: Test php

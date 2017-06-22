@@ -37,17 +37,44 @@ N/A
 Example Playbook
 ----------------
 
+```yaml
+- hosts: ansible
+  user: root
+  tasks:
+     - name: Ensure that role are up to date
+       command: ansible-galaxy install --force {{ item }}
+       with_items:
+          - miquelMariano.common
+       when:
+          - update_mode | default(False)
+       tags: update
+       ignore_errors: yes
+
+- hosts: "{{ servers }}"
+  user: root
+  roles:
+     - role: miquelMariano.lamp
+```
+
+Execute Playbook
+----------------
+
 - Despliegue de todo el stack lamp
 
-`ansible-playbook playbooks/deploy_lamp.yml -i inventory/servers --extra-vars "servers=web"`
-
+```yaml
+ansible-playbook playbooks/deploy_lamp.yml -i inventory/servers -e "servers=web update_mode=true"
+```
 - Despliegue de toto el stack con HAproxy y keepalived
 
-`ansible-playbook playbooks/deploy_lamp.yml -i inventory/servers --extra-vars "servers=web ha_mode=true"`
+```yaml
+ansible-playbook playbooks/deploy_lamp.yml -i inventory/servers -e "servers=web ha_mode=true"
+```
 
 - Despliegue de una servicio concreto
 
-`ansible-playbook playbooks/deploy_lamp.yml -i inventory/servers --extra-vars "servers=web" --tags=mariadb -v`
+```yaml
+ansible-playbook playbooks/deploy_lamp.yml -i inventory/servers -e "servers=web" --tags=mariadb -v
+``
 
 License
 -------
@@ -57,6 +84,4 @@ BSD
 Author Information
 ------------------
 
-@miquelMariano
-
-30/12/2015
+[@miquelMariano](https://twitter.com/miquelMariano)
